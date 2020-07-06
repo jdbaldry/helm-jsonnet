@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: querier
+spec:
+  minReadySeconds: 10
+  replicas: 6
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: querier
+  template:
+    metadata:
+      annotations:
+        schemaID: 167fc59b4652f761fc992213c5cdb24b
+      labels:
+        name: querier
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                name: querier
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - args:
+        - -consul.hostname=consul.{{.Values.namespace}}.svc.cluster.local:8500
+        - -distributor.health-check-ingesters=true
+        - -distributor.replication-factor=3
+        - -distributor.shard-by-all-labels=true
+        - -limits.per-user-override-config=/etc/cortex/overrides.yaml
+        - -log.level=debug
+        - -querier.frontend-address=query-frontend-discovery.{{.Values.namespace}}.svc.cluster.local:9095
+        - -querier.frontend-client.grpc-max-send-msg-size=104857600
+        - -querier.max-concurrent=8
+        - -querier.query-ingesters-within=12h
+        - -querier.query-store-after=15m
+        - -querier.worker-parallelism=4
+        - -ring.heartbeat-timeout=10m
+        - -ring.prefix=
+        - -schema-config-file=/etc/cortex/schema/config.yaml
+        - -server.http-write-timeout=1m
+        - -store.cache-lookups-older-than=36h
+        - -store.cardinality-limit=1000000
+        - -store.chunks-cache.memcached.hostname=memcached.{{.Values.namespace}}.svc.cluster.local
+        - -store.chunks-cache.memcached.service=memcached-client
+        - -store.chunks-cache.memcached.timeout=3s
+        - -store.index-cache-read.cache.enable-fifocache=true
+        - -store.index-cache-read.fifocache.max-size-items=102400
+        - -store.index-cache-read.memcached.hostname=memcached-index-queries.{{.Values.namespace}}.svc.cluster.local
+        - -store.index-cache-read.memcached.service=memcached-client
+        - -store.index-cache-read.memcached.timeout=500ms
+        - -store.index-cache-validity=14m
+        - -store.max-query-length=744h
+        - -target=querier
+        env:
+        - name: JAEGER_REPORTER_MAX_QUEUE_SIZE
+          value: "1024"
+        image: cortexproject/cortex:v1.1.0
+        imagePullPolicy: IfNotPresent
+        name: querier
+        ports:
+        - containerPort: 80
+          name: http-metrics
+        - containerPort: 9095
+          name: grpc
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: 24Gi
+          requests:
+            cpu: "1"
+            memory: 12Gi
+        volumeMounts:
+        - mountPath: /etc/cortex
+          name: overrides
+        - mountPath: /etc/cortex/schema
+          name: schema-167fc59b4652f761fc992213c5cdb24b
+      volumes:
+      - configMap:
+          name: overrides
+        name: overrides
+      - configMap:
+          name: schema-167fc59b4652f761fc992213c5cdb24b
+        name: schema-167fc59b4652f761fc992213c5cdb24b

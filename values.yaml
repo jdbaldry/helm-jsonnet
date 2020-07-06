@@ -1,0 +1,16 @@
+"bigtable_instance": "example-instance-prod"
+"bigtable_project": "example-project1-cortex"
+"namespace": "default"
+"ruler_client_type": "gcs"
+"schema":
+- "chunks":
+    "period": "168h"
+    "prefix": "dev_chunks_"
+  "from": "2019-11-15"
+  "index":
+    "period": "168h"
+    "prefix": "dev_index_"
+  "object_store": "gcs"
+  "schema": "v10"
+  "store": "bigtable-hashed"
+"storage_backend": "gcp"

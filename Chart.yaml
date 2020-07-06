@@ -1,0 +1,8 @@
+"apiVersion": "v2"
+"description": "Horizontally scalable, highly available, multi-tenant, long term Prometheus."
+"icon": "https://cortexmetrics.io/images/cortex-horizontal.svg"
+"maintainers":
+- "email": "jack.baldry@grafana.com"
+  "name": "Jack Baldry"
+"name": "cortex"
+"version": "0.0.1"
