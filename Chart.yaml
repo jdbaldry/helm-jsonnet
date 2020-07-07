@@ -1,4 +1,8 @@
 "apiVersion": "v2"
+"dependencies":
+- "name": "etcd-operator"
+  "repository": "https://kubernetes-charts.storage.googleapis.com/"
+  "version": "0.10.3"
 "description": "Horizontally scalable, highly available, multi-tenant, long term Prometheus."
 "icon": "https://cortexmetrics.io/images/cortex-horizontal.svg"
 "maintainers":

@@ -5,6 +5,7 @@ in
   pkgs.mkShell {
     buildInputs = [
       pkgs.kubernetes-helm
+      pkgs.kube3d
       pkgs.jsonnet
       pkgs.jsonnet-bundler
       pkgs.tanka
