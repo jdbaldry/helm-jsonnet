@@ -7,12 +7,13 @@ MAKEFLAGS   += --no-builtin-rule
 
 HELM_FILES  := templates/ Chart.yaml values.yaml
 ENVIRONMENT := environments/cortex
+TK_TARGETS  := '.*'
 
 all: $(HELM_FILES) .lint
 
 templates/: $(wildcard $(ENVIRONMENT)/*) lib/helm.libsonnet
-	rm -fv templates/*
-	tk export $(ENVIRONMENT) $@
+	rm -fv templates/* >/dev/null
+	tk export $(ENVIRONMENT) -t $(TK_TARGETS) $@
 
 Chart.yaml: $(ENVIRONMENT)/Chart.jsonnet
 	jsonnet -S -J lib -J vendor $< > $@

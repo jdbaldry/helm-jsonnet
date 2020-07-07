@@ -27,7 +27,7 @@ spec:
               matchLabels:
                 name: ingester
             namespaces:
-            - '{{`.Values.namespace`}}'
+            - '{{.Values.namespace}}'
             topologyKey: kubernetes.io/hostname
       containers:
       - args:
@@ -37,7 +37,7 @@ spec:
         - -client=0.0.0.0
         - -config-file=/etc/config/consul-config.json
         - -bootstrap-expect=1
-        - -ui-content-path=/{{`.Values.namespace`}}/consul/
+        - -ui-content-path=/{{.Values.namespace}}/consul/
         env:
         - name: CHECKPOINT_DISABLE
           value: "1"

@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       annotations:
-        schemaID: ce358b780d707166c7c6b678a17ef272
+        schemaID: 167fc59b4652f761fc992213c5cdb24b
       labels:
         name: table-manager
     spec:
@@ -49,8 +49,8 @@ spec:
             memory: 100Mi
         volumeMounts:
         - mountPath: /etc/cortex/schema
-          name: schema-ce358b780d707166c7c6b678a17ef272
+          name: schema-167fc59b4652f761fc992213c5cdb24b
       volumes:
       - configMap:
-          name: schema-ce358b780d707166c7c6b678a17ef272
-        name: schema-ce358b780d707166c7c6b678a17ef272
+          name: schema-167fc59b4652f761fc992213c5cdb24b
+        name: schema-167fc59b4652f761fc992213c5cdb24b

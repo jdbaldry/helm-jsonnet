@@ -1,4 +1,16 @@
 {
+    "master": {
+        "branch": "master",
+        "description": "Nix Packages collection",
+        "homepage": null,
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "1d8018068278a717771e9ec4054dff1ebd3252b0",
+        "sha256": "1vi3wbvlvpd4200swd3594vps1fsnd7775mgzm3nnfs1imzkg00i",
+        "type": "tarball",
+        "url": "https://github.com/nixos/nixpkgs/archive/1d8018068278a717771e9ec4054dff1ebd3252b0.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "niv": {
         "branch": "master",
         "description": "Easy dependency management for Nix projects",

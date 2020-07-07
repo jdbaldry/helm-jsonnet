@@ -23,10 +23,10 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:
       - args:
-        - -consul.hostname=consul.{{`.Values.namespace`}}.svc.cluster.local:8500
+        - -consul.hostname=consul.{{.Values.namespace}}.svc.cluster.local:8500
         - -distributor.ha-tracker.enable=true
         - -distributor.ha-tracker.enable-for-all-users=true
-        - -distributor.ha-tracker.etcd.endpoints=etcd-client.{{`.Values.namespace`}}.svc.cluster.local.:2379
+        - -distributor.ha-tracker.etcd.endpoints=etcd-client.{{.Values.namespace}}.svc.cluster.local.:2379
         - -distributor.ha-tracker.prefix=prom_ha/
         - -distributor.ha-tracker.store=etcd
         - -distributor.health-check-ingesters=true
@@ -35,7 +35,7 @@ spec:
         - -distributor.ingestion-rate-limit-strategy=global
         - -distributor.remote-timeout=20s
         - -distributor.replication-factor=3
-        - -distributor.ring.consul.hostname=consul.{{`.Values.namespace`}}.svc.cluster.local:8500
+        - -distributor.ring.consul.hostname=consul.{{.Values.namespace}}.svc.cluster.local:8500
         - -distributor.ring.prefix=
         - -distributor.shard-by-all-labels=true
         - -limits.per-user-override-config=/etc/cortex/overrides.yaml

@@ -2,7 +2,7 @@
   template(v)::
     local aux(v, path) =
       if (std.isBoolean(v) || std.isString(v) || std.isNumber(v)) then
-        '{{`%s`}}' % path
+        '{{%s}}' % path
       else if std.isArray(v) then
         std.mapWithIndex(function(i, e) aux(e, '(index %s %d)' % [path, i]), v)
       else
