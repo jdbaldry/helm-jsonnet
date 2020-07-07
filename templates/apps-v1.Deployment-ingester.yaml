@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       annotations:
-        schemaID: 167fc59b4652f761fc992213c5cdb24b
+        schemaID: ce358b780d707166c7c6b678a17ef272
       labels:
         name: ingester
     spec:
@@ -31,7 +31,7 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:
       - args:
-        - -consul.hostname=consul.{{.Values.namespace}}.svc.cluster.local:8500
+        - -consul.hostname=consul.{{`.Values.namespace`}}.svc.cluster.local:8500
         - -distributor.health-check-ingesters=true
         - -distributor.replication-factor=3
         - -distributor.shard-by-all-labels=true
@@ -53,10 +53,10 @@ spec:
         - -ring.prefix=
         - -schema-config-file=/etc/cortex/schema/config.yaml
         - -server.grpc-max-concurrent-streams=100000
-        - -store.chunks-cache.memcached.hostname=memcached.{{.Values.namespace}}.svc.cluster.local
+        - -store.chunks-cache.memcached.hostname=memcached.{{`.Values.namespace`}}.svc.cluster.local
         - -store.chunks-cache.memcached.service=memcached-client
         - -store.chunks-cache.memcached.timeout=3s
-        - -store.index-cache-write.memcached.hostname=memcached-index-writes.{{.Values.namespace}}.svc.cluster.local
+        - -store.index-cache-write.memcached.hostname=memcached-index-writes.{{`.Values.namespace`}}.svc.cluster.local
         - -store.index-cache-write.memcached.service=memcached-client
         - -target=ingester
         image: cortexproject/cortex:v1.1.0
@@ -83,12 +83,12 @@ spec:
         - mountPath: /etc/cortex
           name: overrides
         - mountPath: /etc/cortex/schema
-          name: schema-167fc59b4652f761fc992213c5cdb24b
+          name: schema-ce358b780d707166c7c6b678a17ef272
       terminationGracePeriodSeconds: 4800
       volumes:
       - configMap:
           name: overrides
         name: overrides
       - configMap:
-          name: schema-167fc59b4652f761fc992213c5cdb24b
-        name: schema-167fc59b4652f761fc992213c5cdb24b
+          name: schema-ce358b780d707166c7c6b678a17ef272
+        name: schema-ce358b780d707166c7c6b678a17ef272

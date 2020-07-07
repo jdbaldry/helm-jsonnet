@@ -8,8 +8,15 @@ See the Makefile to view the targets involved. To reconstruct all the files and 
 
 ```console
 $ make -B
-$ helm template .
+$ helm template . --generate-name
+manifest_sorter.go:175: info: skipping unknown hook: "crd-install"
+Error: create: failed to create: Secret "sh.helm.release.v1.chart-1594127945.v1" is invalid: data: Too long: must have at most 1048576 characters
 ```
+
+## Issues
+
+- YAML files output by `tk export` may themselves container Go templates (see Prometheus alert rules). Helm will error trying to parse these
+- Currently cannot install rendered helm charts
 
 The dummy helm config is constructed using the `template` function in `lib/helm.libsonnet`;
 

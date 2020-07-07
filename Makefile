@@ -5,18 +5,19 @@ SHELLFLAGS  := -euf -o pipefail
 MAKEFLAGS   += --warn-undefined-variables
 MAKEFLAGS   += --no-builtin-rule
 
-HELM_FILES := templates/ Chart.yaml values.yaml
+HELM_FILES  := templates/ Chart.yaml values.yaml
+ENVIRONMENT := environments/cortex
 
 all: $(HELM_FILES) .lint
 
-templates/: environments/cortex/main.jsonnet
+templates/: $(wildcard $(ENVIRONMENT)/*) lib/helm.libsonnet
 	rm -fv templates/*
-	tk export environments/cortex $@
+	tk export $(ENVIRONMENT) $@
 
-Chart.yaml: Chart.jsonnet
+Chart.yaml: $(ENVIRONMENT)/Chart.jsonnet
 	jsonnet -S -J lib -J vendor $< > $@
 
-values.yaml: values.jsonnet environments/cortex/config.libsonnet
+values.yaml: $(ENVIRONMENT)/values.jsonnet $(ENVIRONMENT)/config.libsonnet
 	jsonnet -S -J lib -J vendor $< > $@
 
 .lint: $(HELM_FILES)

@@ -24,7 +24,7 @@ spec:
       containers:
       - args:
         - -frontend.max-cache-freshness=10m
-        - -frontend.memcached.hostname=memcached-frontend.{{.Values.namespace}}.svc.cluster.local
+        - -frontend.memcached.hostname=memcached-frontend.{{`.Values.namespace`}}.svc.cluster.local
         - -frontend.memcached.service=memcached-client
         - -frontend.memcached.timeout=500ms
         - -limits.per-user-override-config=/etc/cortex/overrides.yaml

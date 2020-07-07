@@ -2,7 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name: consul-sidekick
-  namespace: '{{.Values.namespace}}'
+  namespace: '{{`.Values.namespace`}}'
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -10,4 +10,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: consul-sidekick
-  namespace: '{{.Values.namespace}}'
+  namespace: '{{`.Values.namespace`}}'
