@@ -6,7 +6,7 @@ A dummy helm config is used in the Tanka/Jsonnet evaluation process to put the a
 
 See the Makefile to view the targets involved. To reconstruct all the files and view the resulting helm chart
 
-```
+```console
 $ make -B
 $ helm template .
 ```
@@ -17,13 +17,13 @@ The dummy helm config is constructed using the `template` function in `lib/helm.
 
 For nixos:
 
-```
+```console
 $ nix-shell
 ```
 
 or if you have Lorri and direnv:
 
-```
+```console
 $ direnv allow
 ```
 
