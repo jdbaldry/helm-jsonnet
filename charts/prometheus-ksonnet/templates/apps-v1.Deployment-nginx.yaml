@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: nginx
+  template:
+    metadata:
+      annotations:
+        nginx-config-hash: 9f9286aacc7126da81389ca600d7ab30
+      labels:
+        name: nginx
+    spec:
+      containers:
+      - image: nginx:1.15.1-alpine
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            cpu: 50m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /etc/nginx
+          name: nginx-config
+      volumes:
+      - configMap:
+          name: nginx-config
+        name: nginx-config

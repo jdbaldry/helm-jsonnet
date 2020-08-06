@@ -1,0 +1,12 @@
+"apiVersion": "v2"
+"dependencies":
+- "name": "etcd-operator"
+  "repository": "https://kubernetes-charts.storage.googleapis.com/"
+  "version": "0.10.3"
+"description": "A set of extensible configs for running Prometheus on Kubernetes."
+"icon": "https://cortexmetrics.io/images/cortex-horizontal.svg"
+"maintainers":
+- "email": "jack.baldry@grafana.com"
+  "name": "Jack Baldry"
+"name": "prometheus-ksonnet"
+"version": "0.0.1"

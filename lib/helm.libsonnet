@@ -1,12 +1,36 @@
 {
+  // hasGoTemplate returns true if it believes a string contains a Go template.
+  hasGoTemplate(s)::
+    local braces = std.filter(function(e) e == '{' || e == '}', std.stringChars(s));
+    std.count(braces, '{') >= 2 && std.count(braces, '{') == std.count(braces, '}'),
+
+  // escape escapes all strings that contain Go templates as these will cause errors when Helm tries to render a template.
+  // https://github.com/helm/helm/issues/2798.
+  // Unfortunately, any backticks (`) will terminate the escape string so now we need to replace them with something else.
+  // Presently this function just replaces them with single quotes (') instead and hopes for the best.
+  escape(v)::
+    local aux(v, path) =
+      if std.isObject(v) then
+        std.mapWithKey(function(k, v) aux(v, path + k), v)
+      else if std.isArray(v) then
+        std.mapWithIndex(function(i, e) aux(e, path + i), v)
+      else if std.isString(v) && self.hasGoTemplate(v) then
+        '{{`%s`}}' % std.strReplace(v, '`', "'")
+      else
+        v;
+    aux(v, path=[]),
+
+  // template substitutes all primitive values with Go template that references the path to that value.
+  // This facilitates a mapping between the Kausal pattern of an _config hidden object that is used to configure Jsonnet libraries
+  // and the values.yaml that is used in Helm templating.
   template(v)::
     local aux(v, path) =
-      if (std.isBoolean(v) || std.isString(v) || std.isNumber(v)) then
-        '{{%s}}' % path
+      if std.isObject(v) then
+        std.mapWithKey(function(k, v) aux(v, path + '.%s' % k), v)
       else if std.isArray(v) then
         std.mapWithIndex(function(i, e) aux(e, '(index %s %d)' % [path, i]), v)
       else
-        std.mapWithKey(function(k, v) aux(v, path + '.%s' % k), v);
+        '{{%s}}' % path;
     aux(v, path='.Values'),
 
   // https://helm.sh/docs/topics/charts/
