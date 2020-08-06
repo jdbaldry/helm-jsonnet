@@ -15,6 +15,21 @@ $ helm template helm/cortex --generate-name
 
 The dummy helm config is constructed using the `template` function in `lib/helm.libsonnet`;
 
+Helm uses Go templates which can cause issues when Jsonnet libraries have Go templates themselves like in the prometheus-ksonnet library. This is
+an issue with helm (https://github.com/helm/helm/issues/2798).
+To work around this, an `escape` function has been written that has Helm render raw strings.
+
+```jsonnet
+local config = import './config.libsonnet';
+local helm = import 'helm.libsonnet';
+local prometheus_ksonnet = helm.escape((import 'prometheus-ksonnet/prometheus-ksonnet.libsonnet') + { _config+:: config });
+
+prometheus_ksonnet {
+  namespace:: 'removed',
+  _config+:: helm.template(config),
+}
+```
+
 ## Dependencies
 
 For nixos:
