@@ -9,19 +9,21 @@
   // Unfortunately, any backticks (`) will terminate the escape string so now we need to replace them with something else.
   // Presently this function just replaces them with single quotes (') instead and hopes for the best.
   escape(v)::
-    local aux(v, path) =
+    local aux(v) =
       if std.isObject(v) then
-        std.mapWithKey(function(k, v) aux(v, path + k), v)
+        std.mapWithKey(function(k, v) aux(v), v)
       else if std.isArray(v) then
-        std.mapWithIndex(function(i, e) aux(e, path + i), v)
+        std.mapWithIndex(function(i, e) aux(e), v)
       else if std.isString(v) && self.hasGoTemplate(v) then
         '{{`%s`}}' % std.strReplace(v, '`', "'")
       else
         v;
-    aux(v, path=[]),
+    aux(v),
 
-  // template substitutes all primitive values with Go template that references the path to that value.
-  // This facilitates a mapping between the Kausal pattern of an _config hidden object that is used to configure Jsonnet libraries
+  extract(v):: '',
+
+  // template substitutes all string values with Go template that references the path to that value.
+  // This facilitates a mapping between the Kausal pattern of a hidden object `_config` that is used to configure Jsonnet libraries
   // and the values.yaml that is used in Helm templating.
   template(v)::
     local aux(v, path) =
@@ -29,8 +31,10 @@
         std.mapWithKey(function(k, v) aux(v, path + '.%s' % k), v)
       else if std.isArray(v) then
         std.mapWithIndex(function(i, e) aux(e, '(index %s %d)' % [path, i]), v)
+      else if std.isString(v) then
+        '{{%s}}' % path
       else
-        '{{%s}}' % path;
+        v;
     aux(v, path='.Values'),
 
   // https://helm.sh/docs/topics/charts/

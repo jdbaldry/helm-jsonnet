@@ -17,8 +17,8 @@ all: $(HELM_FILES) $(CHARTS_DIR)/.lint
 	mkdir -p $@
 
 %/templates/.uptodate: $(wildcard $(ENVIRONMENT)/*) lib/helm.libsonnet | %/templates
-	rm -f -- $(@D)/*
-	tk export $(ENVIRONMENT) -t $(TK_TARGETS) $(@D)
+	rm -f -- $(@D)/* $(@D)/.uptodate
+	tk export -e helm=true $(ENVIRONMENT) -t $(TK_TARGETS) $(@D)
 	touch $@
 
 %/Chart.yaml: $(ENVIRONMENT)/Chart.jsonnet

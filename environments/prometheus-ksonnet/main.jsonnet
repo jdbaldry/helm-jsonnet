@@ -1,8 +1,12 @@
 local config = import './config.libsonnet';
 local helm = import 'helm.libsonnet';
-local prometheus_ksonnet = helm.escape((import 'prometheus-ksonnet/prometheus-ksonnet.libsonnet') + { _config+:: config });
+local prometheus_ksonnet = import 'prometheus-ksonnet/prometheus-ksonnet.libsonnet';
 
-prometheus_ksonnet {
-  namespace:: 'removed',
-  _config+:: helm.template(config),
-}
+if std.extVar('helm') then
+  helm.escape(prometheus_ksonnet { _config+:: config }) {
+    _config+:: helm.template(config),
+  }
+else
+  prometheus_ksonnet {
+    _config+:: config,
+  }

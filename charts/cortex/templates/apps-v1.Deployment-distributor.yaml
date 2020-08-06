@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: distributor
+spec:
+  minReadySeconds: 10
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: distributor
+  template:
+    metadata:
+      labels:
+        name: distributor
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                name: distributor
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - args:
+        - -consul.hostname=consul.{{.Values.namespace}}.svc.cluster.local:8500
+        - -distributor.ha-tracker.enable=true
+        - -distributor.ha-tracker.enable-for-all-users=true
+        - -distributor.ha-tracker.etcd.endpoints=etcd-client.{{.Values.namespace}}.svc.cluster.local.:2379
+        - -distributor.ha-tracker.prefix=prom_ha/
+        - -distributor.ha-tracker.store=etcd
+        - -distributor.health-check-ingesters=true
+        - -distributor.ingestion-burst-size=1000000
+        - -distributor.ingestion-rate-limit=100000
+        - -distributor.ingestion-rate-limit-strategy=global
+        - -distributor.remote-timeout=20s
+        - -distributor.replication-factor=3
+        - -distributor.ring.consul.hostname=consul.{{.Values.namespace}}.svc.cluster.local:8500
+        - -distributor.ring.prefix=
+        - -distributor.shard-by-all-labels=true
+        - -limits.per-user-override-config=/etc/cortex/overrides.yaml
+        - -mem-ballast-size-bytes=1073741824
+        - -ring.heartbeat-timeout=10m
+        - -ring.prefix=
+        - -server.grpc.keepalive.max-connection-age=2m
+        - -server.grpc.keepalive.max-connection-age-grace=5m
+        - -server.grpc.keepalive.max-connection-idle=1m
+        - -target=distributor
+        - -validation.reject-old-samples=true
+        - -validation.reject-old-samples.max-age=12h
+        image: cortexproject/cortex:v1.1.0
+        imagePullPolicy: IfNotPresent
+        name: distributor
+        ports:
+        - containerPort: 80
+          name: http-metrics
+        - containerPort: 9095
+          name: grpc
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: 4Gi
+          requests:
+            cpu: "2"
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /etc/cortex
+          name: overrides
+      volumes:
+      - configMap:
+          name: overrides
+        name: overrides

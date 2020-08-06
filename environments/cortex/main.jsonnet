@@ -1,8 +1,9 @@
-local cortex = import 'cortex/cortex.libsonnet';
 local config = import './config.libsonnet';
+local cortex = import 'cortex/cortex.libsonnet';
 local helm = import 'helm.libsonnet';
 
 cortex {
-  namespace:: 'removed',
-  _config+:: helm.template(config),
+  _config+::
+    if std.extVar('helm') then helm.template(config)
+    else config,
 }
