@@ -1,0 +1,97 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    name: ingester
+  name: ingester
+spec:
+  minReadySeconds: 60
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: ingester
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  template:
+    metadata:
+      annotations:
+        schemaID: {{.Values.schemaID}}
+      labels:
+        name: ingester
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                name: ingester
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - args:
+        - -bigtable.instance={{.Values.storageConfig.bigtable.instance}}
+        - -bigtable.project={{.Values.storageConfig.bigtable.project}}
+        - -consul.hostname={{.Values.ringConfig.consul.hostname}}
+        - -distributor.health-check-ingesters=true
+        - -distributor.replication-factor=3
+        - -distributor.shard-by-all-labels=true
+        - -ingester.chunk-encoding=3
+        - -ingester.heartbeat-period=15s
+        - -ingester.join-after=30s
+        - -ingester.max-chunk-age=6h
+        - -ingester.max-chunk-idle={{.Values.max_chunk_idle}}
+        - -ingester.max-global-series-per-metric=100000
+        - -ingester.max-global-series-per-user=1000000
+        - -ingester.max-series-per-metric=0
+        - -ingester.max-series-per-user=0
+        - -ingester.max-stale-chunk-idle=5m
+        - -ingester.max-transfer-retries=60
+        - -ingester.num-tokens=512
+        - -ingester.retain-period=15m
+        - -limits.per-user-override-config=/etc/cortex/overrides.yaml
+        - -ring.heartbeat-timeout={{.Values.distributorConfig.ring.heartbeat-timeout}}
+        - -ring.prefix={{.Values.ringConfig.ring.prefix}}
+        - -schema-config-file={{.Values.storageConfig.schema-config-file}}
+        - -server.grpc-max-concurrent-streams=100000
+        - -store.chunks-cache.memcached.hostname={{.Values.storeConfig.store.chunks-cache.memcached.hostname}}
+        - -store.chunks-cache.memcached.service={{.Values.storeConfig.store.chunks-cache.memcached.service}}
+        - -store.chunks-cache.memcached.timeout={{.Values.storeConfig.store.chunks-cache.memcached.timeout}}
+        - -store.index-cache-write.memcached.hostname=memcached-index-writes.{{.Values.namespace}}.svc.cluster.local
+        - -store.index-cache-write.memcached.service=memcached-client
+        - -target=ingester
+        image: cortexproject/cortex:v1.1.0
+        imagePullPolicy: IfNotPresent
+        name: ingester
+        ports:
+        - containerPort: 80
+          name: http-metrics
+        - containerPort: 9095
+          name: grpc
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: 25Gi
+          requests:
+            cpu: "4"
+            memory: 15Gi
+        volumeMounts:
+        - mountPath: /etc/cortex
+          name: overrides
+        - mountPath: /etc/cortex/schema
+          name: schema-{{.Values.schemaID}}
+      terminationGracePeriodSeconds: 4800
+      volumes:
+      - configMap:
+          name: overrides
+        name: overrides
+      - configMap:
+          name: schema-{{.Values.schemaID}}
+        name: schema-{{.Values.schemaID}}

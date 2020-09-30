@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+data:
+  dashboards.yml: |
+    apiVersion: 1
+    providers:
+      - disableDeletion: true
+        editable: false
+        folder: ""
+        name: dashboards
+        options:
+            path: /grafana/dashboards
+        orgId: 1
+        type: file
+      - disableDeletion: true
+        editable: false
+        folder: Kubernetes
+        name: dashboards-kubernetes
+        options:
+            path: /grafana/dashboards-kubernetes
+        orgId: 1
+        type: file
+      - disableDeletion: true
+        editable: false
+        folder: Prometheus
+        name: dashboards-prometheus
+        options:
+            path: /grafana/dashboards-prometheus
+        orgId: 1
+        type: file
+      - disableDeletion: true
+        editable: false
+        folder: node_exporter
+        name: dashboards-node-exporter
+        options:
+            path: /grafana/dashboards-node-exporter
+        orgId: 1
+        type: file
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-provisioning

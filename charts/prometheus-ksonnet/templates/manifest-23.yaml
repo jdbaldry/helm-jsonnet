@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: kube-state-metrics
+  name: kube-state-metrics
+spec:
+  ports:
+  - name: kube-state-metrics-http-metrics
+    port: 80
+    targetPort: 80
+  - name: kube-state-metrics-self-metrics
+    port: 81
+    targetPort: 81
+  selector:
+    name: kube-state-metrics

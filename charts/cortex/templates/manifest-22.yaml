@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: querier
+spec:
+  minReadySeconds: 10
+  replicas: 6
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: querier
+  template:
+    metadata:
+      annotations:
+        schemaID: {{.Values.schemaID}}
+      labels:
+        name: querier
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                name: querier
+            topologyKey: kubernetes.io/hostname
+      containers:
+      - args:
+        - -bigtable.instance={{.Values.storageConfig.bigtable.instance}}
+        - -bigtable.project={{.Values.storageConfig.bigtable.project}}
+        - -consul.hostname={{.Values.ringConfig.consul.hostname}}
+        - -distributor.health-check-ingesters=true
+        - -distributor.replication-factor=3
+        - -distributor.shard-by-all-labels=true
+        - -log.level=debug
+        - -querier.frontend-address=query-frontend-discovery.{{.Values.namespace}}.svc.cluster.local:9095
+        - -querier.frontend-client.grpc-max-send-msg-size=104857600
+        - -querier.max-concurrent=8
+        - -querier.query-ingesters-within={{.Values.queryConfig.querier.queryingesterswithin}}
+        - -querier.query-store-after={{.Values.queryConfig.querier.query-store-after}}
+        - -querier.worker-parallelism=4
+        - -ring.heartbeat-timeout={{.Values.distributorConfig.ring.heartbeat-timeout}}
+        - -ring.prefix={{.Values.ringConfig.ring.prefix}}
+        - -schema-config-file={{.Values.storageConfig.schema-config-file}}
+        - -server.http-write-timeout=1m
+        - -store.cache-lookups-older-than={{.Values.queryConfig.store.cache-lookups-older-than}}
+        - -store.cardinality-limit=1000000
+        - -store.chunks-cache.memcached.hostname={{.Values.storeConfig.store.chunks-cache.memcached.hostname}}
+        - -store.chunks-cache.memcached.service={{.Values.storeConfig.store.chunks-cache.memcached.service}}
+        - -store.chunks-cache.memcached.timeout={{.Values.storeConfig.store.chunks-cache.memcached.timeout}}
+        - -store.index-cache-read.cache.enable-fifocache=true
+        - -store.index-cache-read.fifocache.max-size-items=102400
+        - -store.index-cache-read.memcached.hostname={{.Values.queryConfig.store.index-cache-read.memcached.hostname}}
+        - -store.index-cache-read.memcached.service={{.Values.queryConfig.store.index-cache-read.memcached.service}}
+        - -store.index-cache-read.memcached.timeout={{.Values.queryConfig.store.index-cache-read.memcached.timeout}}
+        - -store.index-cache-validity={{.Values.queryConfig.store.index-cache-validity}}
+        - -store.max-query-length={{.Values.queryConfig.store.max-query-length}}
+        - -target=querier
+        env:
+        - name: JAEGER_REPORTER_MAX_QUEUE_SIZE
+          value: "1024"
+        image: cortexproject/cortex:v1.1.0
+        imagePullPolicy: IfNotPresent
+        name: querier
+        ports:
+        - containerPort: 80
+          name: http-metrics
+        - containerPort: 9095
+          name: grpc
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+        resources:
+          limits:
+            memory: 24Gi
+          requests:
+            cpu: "1"
+            memory: 12Gi
+        volumeMounts:
+        - mountPath: /etc/cortex
+          name: overrides
+        - mountPath: /etc/cortex/schema
+          name: schema-{{.Values.schemaID}}
+      volumes:
+      - configMap:
+          name: overrides
+        name: overrides
+      - configMap:
+          name: schema-{{.Values.schemaID}}
+        name: schema-{{.Values.schemaID}}

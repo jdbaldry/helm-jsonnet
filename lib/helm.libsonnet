@@ -16,25 +16,36 @@
         std.mapWithIndex(function(i, e) aux(e), v)
       else if std.isString(v) && self.hasGoTemplate(v) then
         '{{`%s`}}' % std.strReplace(v, '`', "'")
-      else
-        v;
+      else v;
     aux(v),
 
-  extract(v):: '',
+  render(v)::
+    local aux(v) =
+      if std.isObject(v) then
+        std.mapWithKey(function(k, v) aux(v), v)
+      else if std.isArray(v) then
+        std.map(function(e) aux(v), v)
+      else if std.isString(v) then
+        std.strReplace(std.strReplace(v, '⍾⍾', '}}'), '␇␇', '{{')
+      else v;
+    aux(v),
 
   // template substitutes all string values with Go template that references the path to that value.
   // This facilitates a mapping between the Kausal pattern of a hidden object `_config` that is used to configure Jsonnet libraries
   // and the values.yaml that is used in Helm templating.
   template(v)::
+    self.escape(v { _config:: $.prepare(v._config) }),
+
+
+  prepare(v)::
     local aux(v, path) =
       if std.isObject(v) then
         std.mapWithKey(function(k, v) aux(v, path + '.%s' % k), v)
       else if std.isArray(v) then
         std.mapWithIndex(function(i, e) aux(e, '(index %s %d)' % [path, i]), v)
-      else if std.isString(v) then
-        '{{%s}}' % path
-      else
-        v;
+      else if std.isString(v) then '␇␇%s⍾⍾' % path
+      else v;
+
     aux(v, path='.Values'),
 
   // https://helm.sh/docs/topics/charts/

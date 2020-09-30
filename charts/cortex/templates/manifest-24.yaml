@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: table-manager
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: table-manager
+  template:
+    metadata:
+      annotations:
+        schemaID: {{.Values.schemaID}}
+      labels:
+        name: table-manager
+    spec:
+      containers:
+      - args:
+        - -bigtable.backoff-on-ratelimits=true
+        - -bigtable.grpc-client-rate-limit=5
+        - -bigtable.grpc-client-rate-limit-burst=5
+        - -bigtable.instance={{.Values.storageConfig.bigtable.instance}}
+        - -bigtable.project={{.Values.storageConfig.bigtable.project}}
+        - -bigtable.table-cache.enabled=true
+        - -table-manager.periodic-table.grace-period=3h
+        - -table-manager.poll-interval=10m
+        - -target=table-manager
+        image: cortexproject/cortex:v1.1.0
+        imagePullPolicy: IfNotPresent
+        name: table-manager
+        ports:
+        - containerPort: 80
+          name: http-metrics
+        - containerPort: 9095
+          name: grpc
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /etc/cortex/schema
+          name: schema-{{.Values.schemaID}}
+      volumes:
+      - configMap:
+          name: schema-{{.Values.schemaID}}
+        name: schema-{{.Values.schemaID}}

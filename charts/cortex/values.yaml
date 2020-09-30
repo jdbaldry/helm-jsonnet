@@ -1,7 +1,75 @@
+"alertmanager_enabled": false
+"aws_region": null
 "bigtable_instance": "example-instance-prod"
 "bigtable_project": "example-project1-cortex"
+"cassandra_addresses": null
+"client_configs":
+  "aws": {}
+  "cassandra": {}
+  "gcp":
+    "bigtable.instance": "example-instance-prod"
+    "bigtable.project": "example-project1-cortex"
+"cluster": "test"
+"consul_replicas": 1
+"distributorConfig":
+  "distributor.health-check-ingesters": true
+  "distributor.replication-factor": 3
+  "distributor.shard-by-all-labels": true
+  "ring.heartbeat-timeout": "10m"
+"enable_pod_priorities": false
+"enable_rbac": true
+"enabledBackends":
+- "gcp"
+"external_url": "localhost:8080"
+"jaeger_agent_host": null
+"max_chunk_idle": "15m"
+"memcached_chunks_enabled": true
+"memcached_chunks_max_item_size_mb": 1
+"memcached_index_queries_enabled": true
+"memcached_index_queries_max_item_size_mb": 5
+"memcached_index_writes_enabled": true
+"memcached_index_writes_max_item_size_mb": 1
+"memcached_metadata_enabled": false
+"memcached_metadata_max_item_size_mb": 1
+"multi_kv_config": {}
 "namespace": "default"
+"other_namespaces": []
+"overrides": {}
+"querier":
+  "concurrency": 8
+  "replicas": 6
+"queryConfig":
+  "limits.per-user-override-config": "/etc/cortex/overrides.yaml"
+  "querier.query-ingesters-within": "12h"
+  "querier.query-store-after": "15m"
+  "store.cache-lookups-older-than": "36h"
+  "store.cardinality-limit": 1000000
+  "store.index-cache-read.cache.enable-fifocache": true
+  "store.index-cache-read.fifocache.max-size-items": 102400
+  "store.index-cache-read.memcached.hostname": "memcached-index-queries.default.svc.cluster.local"
+  "store.index-cache-read.memcached.service": "memcached-client"
+  "store.index-cache-read.memcached.timeout": "500ms"
+  "store.index-cache-validity": "14m"
+  "store.max-query-length": "744h"
+"queryFrontend":
+  "replicas": 2
+  "shard_factor": 16
+  "sharded_queries_enabled": false
+"query_tee_backend_endpoints": []
+"query_tee_backend_preferred": ""
+"query_tee_enabled": false
+"replication_factor": 3
+"ringConfig":
+  "consul.hostname": "consul.default.svc.cluster.local:8500"
+  "ring.prefix": ""
+"rulerClientConfig":
+  "ruler.storage.gcs.bucketname": null
+  "ruler.storage.type": "gcs"
 "ruler_client_type": "gcs"
+"ruler_enabled": false
+"ruler_gcs_bucket_name": null
+"ruler_s3_bucket_name": null
+"s3_bucket_name": null
 "schema":
 - "chunks":
     "period": "168h"
@@ -13,4 +81,26 @@
   "object_store": "gcs"
   "schema": "v10"
   "store": "bigtable-hashed"
+"schemaID": "dbc87f42c5b28d624cc4e8dab062257d"
+"storageConfig":
+  "bigtable.instance": "example-instance-prod"
+  "bigtable.project": "example-project1-cortex"
+  "schema-config-file": "/etc/cortex/schema/config.yaml"
+"storageTSDBConfig": {}
 "storage_backend": "gcp"
+"storage_engine": "chunks"
+"storage_tsdb_bucket_name": null
+"storeConfig":
+  "store.chunks-cache.memcached.hostname": "memcached.default.svc.cluster.local"
+  "store.chunks-cache.memcached.service": "memcached-client"
+  "store.chunks-cache.memcached.timeout": "3s"
+"storeMemcachedChunksConfig":
+  "store.chunks-cache.memcached.hostname": "memcached.default.svc.cluster.local"
+  "store.chunks-cache.memcached.service": "memcached-client"
+  "store.chunks-cache.memcached.timeout": "3s"
+"store_gateway_replication_factor": 3
+"table_manager_enabled": true
+"table_prefix": "default"
+"test_exporter_enabled": false
+"test_exporter_start_time": null
+"test_exporter_user_id": null

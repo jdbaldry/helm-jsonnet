@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: kube-state-metrics
+  template:
+    metadata:
+      annotations:
+        prometheus.io.scrape: "false"
+      labels:
+        name: kube-state-metrics
+    spec:
+      containers:
+      - args:
+        - --port=80
+        - --telemetry-host=0.0.0.0
+        - --telemetry-port=81
+        image: gcr.io/google_containers/kube-state-metrics:v1.6.0
+        imagePullPolicy: IfNotPresent
+        name: kube-state-metrics
+        ports:
+        - containerPort: 80
+          name: http-metrics
+        - containerPort: 81
+          name: self-metrics
+        resources:
+          limits:
+            cpu: 250m
+            memory: 150Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
+      serviceAccount: kube-state-metrics

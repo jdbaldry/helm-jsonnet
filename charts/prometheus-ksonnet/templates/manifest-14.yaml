@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+data:
+  prometheus.yml: |
+    apiVersion: 1
+    datasources:
+      - access: proxy
+        editable: false
+        isDefault: true
+        jsonData:
+            httpMethod: GET
+        name: prometheus
+        type: prometheus
+        url: http://prometheus.{{.Values.namespace}}.svc.{{.Values.cluster_dns_suffix}}{{.Values.prometheus_web_route_prefix}}
+        version: 1
+kind: ConfigMap
+metadata:
+  labels: {}
+  name: grafana-datasources

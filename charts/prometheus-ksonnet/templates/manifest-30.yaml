@@ -1,0 +1,84 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: prometheus
+  serviceName: prometheus
+  template:
+    metadata:
+      annotations:
+        prometheus.io.path: {{.Values.prometheus_web_route_prefix}}metrics
+      labels:
+        name: prometheus
+    spec:
+      containers:
+      - args:
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --web.listen-address=:9090
+        - --web.external-url={{.Values.prometheus_external_hostname}}{{.Values.prometheus_path}}
+        - --web.enable-admin-api
+        - --web.enable-lifecycle
+        - --web.route-prefix={{.Values.prometheus_web_route_prefix}}
+        - --storage.tsdb.path=/prometheus/data
+        - --storage.tsdb.wal-compression
+        image: prom/prometheus:v2.19.2
+        imagePullPolicy: IfNotPresent
+        name: prometheus
+        ports:
+        - containerPort: 9090
+          name: http-metrics
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2Gi
+          requests:
+            cpu: 250m
+            memory: 1536Mi
+        volumeMounts:
+        - mountPath: /prometheus
+          name: prometheus-data
+        - mountPath: /etc/prometheus
+          name: prometheus-config
+      - args:
+        - -v
+        - -t
+        - -p=/etc/prometheus
+        - curl
+        - -X
+        - POST
+        - --fail
+        - -o
+        - '-'
+        - -sS
+        - http://localhost:9090{{.Values.prometheus_web_route_prefix}}-/reload
+        image: weaveworks/watch:master-5b2a6e5
+        imagePullPolicy: IfNotPresent
+        name: watch
+        volumeMounts:
+        - mountPath: /etc/prometheus
+          name: prometheus-config
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 1000
+      serviceAccount: prometheus
+      volumes:
+      - configMap:
+          name: prometheus-config
+        name: prometheus-config
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: prometheus-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 300Gi

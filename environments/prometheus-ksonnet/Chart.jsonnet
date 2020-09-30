@@ -9,8 +9,5 @@ std.manifestYamlDoc(
   helm.chart.new('v2', 'prometheus-ksonnet', '0.0.1')
   + helm.chart.withDescription('A set of extensible configs for running Prometheus on Kubernetes.')
   + helm.chart.withMaintainers(maintainers)
-  + helm.chart.withIcon('https://cortexmetrics.io/images/cortex-horizontal.svg')
-  + helm.chart.withDependencies(
-    [helm.dependency.new('etcd-operator', '0.10.3', 'https://kubernetes-charts.storage.googleapis.com/')]
-  )
+  + helm.chart.withIcon('https://prometheus.io/assets/prometheus_logo_grey.svg')
 )

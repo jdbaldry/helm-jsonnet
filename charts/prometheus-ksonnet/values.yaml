@@ -1,2 +1,41 @@
+"admin_services":
+- "allowWebsockets": true
+  "path": "grafana"
+  "title": "Grafana"
+  "url": "http://grafana.default.svc.cluster.local/"
+- "path": "prometheus"
+  "title": "Prometheus"
+  "url": "http://prometheus.default.svc.cluster.local/prometheus/"
+"alertmanager_cluster_self":
+  "global": true
+  "replicas": 0
+"alertmanager_clusters": {}
+"alertmanager_external_hostname": "http://alertmanager.default.svc.cluster.local"
+"alertmanager_gossip_port": 9094
+"alertmanager_path": "/alertmanager/"
+"alertmanager_port": 9093
+"apiServerAddress": "kubernetes.default.svc.cluster.local:443"
+"cluster_dns_suffix": "cluster.local"
+"cluster_dns_tld": "local"
 "cluster_name": "helm"
+"dashboard_config_maps": 0
+"enable_pod_priorities": false
+"enable_rbac": true
+"grafana_dashboard_labels": {}
+"grafana_datasource_labels": {}
+"grafana_notification_channel_labels": {}
+"grafana_provisioning_dir": "/etc/grafana/provisioning"
+"grafana_root_url": "http://nginx.default.svc.cluster.local/grafana"
+"insecureSkipVerify": false
 "namespace": "default"
+"node_exporter_mount_root": true
+"oauth_enabled": false
+"prometheus_api_server_address": "kubernetes.default.svc.cluster.local:443"
+"prometheus_external_hostname": "http://prometheus.default.svc.cluster.local"
+"prometheus_insecure_skip_verify": false
+"prometheus_path": "/prometheus/"
+"prometheus_port": 9090
+"prometheus_web_route_prefix": "/prometheus/"
+"scrape_api_server_endpoints": true
+"slack_channel": "general"
+"slack_url": "http://slack"
